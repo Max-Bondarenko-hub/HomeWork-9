@@ -24,27 +24,19 @@ def hello_command():
     return 'How can I help you?'
 
 @input_error
-def add_command(data):
-    splitted_data = data.split()
-    name = splitted_data[1]
-    phone = splitted_data[2]
-    phonebook[name] = phone
-    return f'{name} with phone number {phone} was added to the phonebook'
+def add_command(u_name, ph_number):
+    phonebook[u_name] = ph_number
+    return f'{u_name} with phone number {ph_number} was added to the phonebook'
 
 @input_error
-def change_command(data):
-    splitted_data = data.split()
-    name = splitted_data[1]
-    phone = splitted_data[2]
-    if phonebook[name]:
-        phonebook[name] = phone
-        return f'Phone number for user {name} was changed to {phone}'
+def change_command(u_name, ph_number):
+    if phonebook[u_name]:
+        phonebook[u_name] = ph_number
+        return f'Phone number for user {u_name} was changed to {ph_number}'
 
 @input_error
-def show_phone(data):
-    splitted_data = data.split()
-    name = splitted_data[1]
-    return f'Phone number for user {name} is {phonebook[name]}'
+def show_phone(u_name):
+    return f'Phone number for user {u_name} is {phonebook[u_name]}'
 
 def show_all_command(data):
     if data == {}:
@@ -55,9 +47,10 @@ def show_all_command(data):
             user_and_phones_list.append('|{:<10}|{:<12}|'.format(user, phone))
         return user_and_phones_list
 
+@input_error
 def parser(command):
     cased_command = str(command.casefold())
-    first_word = cased_command.split()
+    splitted_string = cased_command.split()
 
     if cased_command in ('good bye', 'close', 'exit'):
         return 'exit'
@@ -65,20 +58,20 @@ def parser(command):
     if cased_command.startswith('show all'):
         return show_all_command(phonebook)
 
-    if (first_word[0] not in COMMANDS):
+    if (splitted_string[0] not in COMMANDS):
         return 'Wrong command...'
     
     if cased_command.startswith('hello'):
         return hello_command()
     
     if cased_command.startswith('add'):
-        return add_command(command)
+        return add_command(splitted_string[1], splitted_string[2])
     
     if cased_command.startswith('change'):
-        return change_command(command)
+        return change_command(splitted_string[1], splitted_string[2])
     
     if cased_command.startswith('phone'):
-        return show_phone(command)
+        return show_phone(splitted_string[1])
     
 def main():
     print(greeting)
@@ -96,5 +89,6 @@ def main():
                 print(el)
         else:
             print(result)
-        
-main()
+
+if __name__ == "__main__":        
+    main()
