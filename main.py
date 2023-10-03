@@ -46,7 +46,7 @@ def show_phone(data):
     name = splitted_data[1]
     return f'Phone number for user {name} is {phonebook[name]}'
 
-def show_all_command(data: dict):
+def show_all_command(data):
     if data == {}:
         return 'empty'
     else:
