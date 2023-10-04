@@ -59,7 +59,7 @@ def show_all_command(data):
 
 def parser(command):
     cased_command = str(command.casefold())
-    splitted_string = splitter(command)
+    splitted_string = splitter(cased_command)
 
     if command == 'show all':
         return CMDS[command](phonebook)
