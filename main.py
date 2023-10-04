@@ -9,11 +9,14 @@ greeting = """To start a conversation with Bot, you must enter one of the follow
 phonebook = {}
 
 CMDS = {
-    'hello': lambda _: 'How can I help you?',
-    'add': lambda command_line: add_command(command_line),
-    'change': lambda command_line: change_command(command_line),
-    'phone': lambda command_line: show_phone(command_line),
-    'show all': lambda phonebook: show_all_command(phonebook) 
+    'hello': lambda *args: say_hello(),
+    'add': lambda *args: add_command(*args),
+    'change': lambda *args: change_command(*args),
+    'phone': lambda *args: show_phone(*args),
+    'show all': lambda *args: show_all_command(*args),
+    'exit': lambda *args: say_goodbye(),
+    'close': lambda *args: say_goodbye(),
+    'good bye': lambda *args: say_goodbye()
 }
 
 def input_error(func):
@@ -24,61 +27,61 @@ def input_error(func):
             return 'Please, enter Username and phone number'
         except KeyError:
             return 'The user does not exist...'
+        except TypeError:
+            return 'Enter username to find phone number'
     return inner
         
 def splitter(command_string):
     splitted = command_string.split()
     return splitted
 
-@input_error
-def add_command(command_line):
-    splitted = splitter(command_line)
-    phonebook[splitted[1]] = splitted[2]
-    return f'{splitted[1]} with phone number {splitted[2]} was added to the phonebook'
+def say_hello():
+    return 'How can I help you?'
+
+def say_goodbye():
+    return 'exit'
 
 @input_error
-def change_command(command_line):
-    splitted = splitter(command_line)
-    if phonebook[splitted[1]]:
-        phonebook[splitted[1]] = splitted[2]
-        return f'Phone number for user {splitted[1]} was changed to {splitted[2]}'
+def add_command(*args):
+    phonebook[args[0]] = args[1]
+    return f'{args[0]} with phone number {args[1]} was added to the phonebook'
 
 @input_error
-def show_phone(command_line):
-    splitted = splitter(command_line)
-    return f'Phone number for user {splitted[1]} is {phonebook[splitted[1]]}'
+def change_command(*args):
+    if phonebook[args[0]]:
+        phonebook[args[0]] = args[1]
+        return f'Phone number for user {args[0]} was changed to {args[1]}'
 
-def show_all_command(data):
-    if data == {}:
+@input_error
+def show_phone(usr_name):
+    return f'Phone number for user {usr_name} --> {phonebook[usr_name]}'
+
+def show_all_command(*args):
+    if phonebook == {}:
         return 'empty'
     else:
         user_and_phones_list = ['|{:^10}|{:^12}|'.format('Username', 'Phone number')]
-        for user, phone in data.items():
+        for user, phone in phonebook.items():
             user_and_phones_list.append('|{:<10}|{:<12}|'.format(user, phone))
         return user_and_phones_list
 
-def parser(command):
+def parser(command: str):
     cased_command = str(command.casefold())
-    splitted_string = splitter(cased_command)
 
-    if command == 'show all':
-        return CMDS[command](phonebook)
-
-    for cmd in CMDS.keys():
-        if cmd == splitted_string[0]:
-            return CMDS[cmd](command)
-    
+    for kw, func in CMDS.items():
+        if cased_command.startswith(kw):
+            data = command[len(kw):].strip().split()
+            return func(*data)
     return 'Wrong command...'
     
 def main():
     print(greeting)
     while True:
         users_input = input('Please, enter the command: ')
-        if users_input in ('good bye', 'close', 'exit'):
+        result = parser(users_input)
+        if result == 'exit':
             print('Good Bye!')
             break
-
-        result = parser(users_input)
 
         if result == 'empty':
             print('Phone book is empty yet, please add username and phone number')
