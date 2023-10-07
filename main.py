@@ -71,25 +71,28 @@ def parser(command: str):
     for kw, func in CMDS.items():
         if cased_command.startswith(kw):
             data = command[len(kw):].strip().split()
-            return func(*data)
-    return 'Wrong command...'
+            return data, func
+    return 'Wrong command...', None
     
 def main():
     print(greeting)
     while True:
         users_input = input('Please, enter the command: ')
-        result = parser(users_input)
-        if result == 'exit':
+        data, func = parser(users_input)
+        if func:
+            data = func(*data)
+
+        if data == 'exit':
             print('Good Bye!')
             break
 
-        if result == 'empty':
+        if data == 'empty':
             print('Phone book is empty yet, please add username and phone number')
-        elif isinstance(result, list):
+        elif isinstance(data, list):
             for el in show_all_command(phonebook):
                 print(el)
         else:
-            print(result)
+            print(data)
 
 if __name__ == "__main__":        
     main()
